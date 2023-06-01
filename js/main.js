@@ -1,22 +1,23 @@
 'use strict'
 
 const MINE = '💣'
+const MARKED = '🎌'
 var gBoard
 var gGame
 
+gGame = {
+    isOn: false,
+    shownCount: 0,
+    markedCount: 0,
+    secsPassed: 0
+}
 function onInit() {
-    gGame = {
-        isOn: false,
-        shownCount: 0,
-        markedCount: 0,
-        secsPassed: 0
-    }
 
     gBoard = buildBoard()
-    console.table('gBoard', gBoard)
-    renderBoard(gBoard)
     boardPass(gBoard)
-
+    renderBoard(gBoard)
+    console.log('gBoard', gBoard)
+    gGame.isOn = true
 }
 
 function buildBoard() {
@@ -30,7 +31,7 @@ function buildBoard() {
                 minesAroundCount: 0,
                 isShown: false,
                 isMine: false,
-                isMarked: true,
+                isMarked: false,
             }
             if (i === 1 && j === 1 || i === 3 && j === 0) {
                 board[i][j].isMine = true
@@ -39,24 +40,25 @@ function buildBoard() {
 
         }
     }
-
     return board
 }
 
-function renderBoard(board) {
+function renderBoard(gBoard) {
     var strHTML = ''
-    for (var i = 0; i < board.length; i++) {
+    for (var i = 0; i < gBoard.length; i++) {
         strHTML += '<tr>'
-        for (var j = 0; j < board[0].length; j++) {
-            const currCell = board[i][j]
+        for (var j = 0; j < gBoard[0].length; j++) {
+            const currCell = gBoard[i][j]
 
             var cell
+
             if (!currCell.isShown) {
                 cell = ''
-            } else if (currCell.isMine) {
-                cell = MINE
             } else {
-                cell = currCell.minesAroundCount
+                if (currCell.isMine) {
+                    cell = MINE
+                }
+                else cell = currCell.minesAroundCount
             }
 
 
@@ -93,4 +95,19 @@ function setMinesNegsCount(board, rowIdx, colIdx) {
     return minesAroundCount
 }
 
+function onCellClicked(i, j, ev) {
+    gBoard[i][j].isShown = true
+
+    if (gBoard[i][j].isMine) {
+        gameOver()
+    }
+
+    renderBoard(gBoard)
+}
+
+function gameOver() {
+    console.log('game over')
+    gGame.isOn = false
+
+}
 
